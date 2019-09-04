@@ -4,6 +4,8 @@ main();
 
 function main() {
     const canvas = document.querySelector('#c');
+    canvas.addEventListener('mousemove', updateMousePosition)
+
     const renderer = new THREE.WebGLRenderer({canvas});
     const fov = 75;
     const aspect = 2;  // the canvas default
@@ -30,6 +32,11 @@ function main() {
     light.position.set(-1, 2, 4);
     scene.add(light);
 
+    let mouseEvent;
+    function updateMousePosition(e) {
+        mouseEvent = e;
+    }
+
     function resizeRendererToDisplaySize(renderer) {
         const canvas = renderer.domElement;
         const width = canvas.clientWidth;
@@ -39,19 +46,23 @@ function main() {
           renderer.setSize(width, height, false);
         }
         return needResize;
-      }
+    }
 
     function render(time) {
-        time *= 0.001;  // convert time to seconds
-       
+        const canvas = renderer.domElement;
+        const canvasWidth = canvas.clientWidth;
+        const canvasHeight = canvas.clientHeight;
         if (resizeRendererToDisplaySize(renderer)) {
-            const canvas = renderer.domElement;
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.aspect = canvasWidth / canvasHeight;
             camera.updateProjectionMatrix();
         }
 
-        cube.rotation.x = time;
-        cube.rotation.y = time;
+        if (mouseEvent) {
+            const x = (mouseEvent.clientX - canvasWidth) / (canvasWidth / 2);
+            const y = (mouseEvent.clientY - canvasHeight) / (canvasHeight / 2);
+            cube.rotation.x = y;
+            cube.rotation.y = x;
+        }
        
         renderer.render(scene, camera);
        
