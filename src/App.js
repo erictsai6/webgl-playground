@@ -1,10 +1,13 @@
 import * as THREE from 'three';
+import { Bullet } from './bullet';
 
 main();
 
 function main() {
     const canvas = document.querySelector('#c');
     canvas.addEventListener('mousemove', updateMousePosition)
+    canvas.addEventListener('mousedown', addBullet)
+
 
     const renderer = new THREE.WebGLRenderer({canvas});
     const fov = 75;
@@ -16,9 +19,9 @@ function main() {
 
     const scene = new THREE.Scene();
 
-    const boxWidth = 1;
-    const boxHeight = 1;
-    const boxDepth = 1;
+    const boxWidth = 0.5;
+    const boxHeight = 0.5;
+    const boxDepth = 0.5;
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
@@ -35,6 +38,17 @@ function main() {
     let mouseEvent;
     function updateMousePosition(e) {
         mouseEvent = e;
+    }
+
+    const bullets = []
+    function addBullet(e) {
+        const canvasWidth = canvas.clientWidth;
+        const canvasHeight = canvas.clientHeight;
+        const x = (e.clientX - canvasWidth / 2) / (canvasWidth / 2);
+        const y = (e.clientY - canvasHeight/ 2) / (canvasHeight / 2);
+        const bullet = new Bullet(x, -y);
+        bullets.push(bullet);
+        scene.add(bullet.model);
     }
 
     function resizeRendererToDisplaySize(renderer) {
@@ -62,6 +76,17 @@ function main() {
             const y = (mouseEvent.clientY - canvasHeight) / (canvasHeight / 2);
             cube.rotation.x = y;
             cube.rotation.y = x;
+        }
+
+        for (const index in bullets) {
+            const bullet = bullets[index];
+            if (!bullet) {
+                continue;
+            }
+            bullet.next();
+            if (bullet.invalid()) {
+                bullets[index] = null;
+            }
         }
        
         renderer.render(scene, camera);
