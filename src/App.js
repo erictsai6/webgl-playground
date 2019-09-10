@@ -72,8 +72,8 @@ function main() {
         }
 
         if (mouseEvent) {
-            const x = (mouseEvent.clientX - canvasWidth) / (canvasWidth / 2);
-            const y = (mouseEvent.clientY - canvasHeight) / (canvasHeight / 2);
+            const x = (mouseEvent.clientX - canvasWidth / 2) / (canvasWidth / 2);
+            const y = (mouseEvent.clientY - canvasHeight / 2) / (canvasHeight / 2);
             cube.rotation.x = y;
             cube.rotation.y = x;
         }
