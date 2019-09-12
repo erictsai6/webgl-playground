@@ -5,15 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html",
+    "start2": "parcel src2/index.html",
+    "build": "parcel build src2/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Tsai",
   "license": "ISC",
   "dependencies": {
+    "@babylonjs/core": "^4.0.3",
+    "@babylonjs/materials": "^4.0.3",
     "three": "^0.108.0"
   },
   "devDependencies": {
-    "parcel": "^1.12.3"
+    "parcel": "^1.12.3",
+    "typescript": "^3.6.3"
   }
 }

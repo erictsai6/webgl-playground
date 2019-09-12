@@ -18,16 +18,18 @@ function main() {
     camera.position.z = 2;
 
     const scene = new THREE.Scene();
-
-    const boxWidth = 0.5;
-    const boxHeight = 0.5;
-    const boxDepth = 0.5;
-    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+    
+    const radius = 0.3;
+    const height = 0.6;
+    const segments = 16;
+    const geometry = new THREE.ConeBufferGeometry(radius, height, segments);
 
     const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
-    const cube = new THREE.Mesh(geometry, material);
+    const player = new THREE.Mesh(geometry, material);
+    player.position.x = 0;
+    player.position.y = -1;
 
-    scene.add(cube);
+    scene.add(player);
 
     const color = 0xFFFFFF;
     const intensity = 1;
@@ -74,8 +76,8 @@ function main() {
         if (mouseEvent) {
             const x = (mouseEvent.clientX - canvasWidth / 2) / (canvasWidth / 2);
             const y = (mouseEvent.clientY - canvasHeight / 2) / (canvasHeight / 2);
-            cube.rotation.x = y;
-            cube.rotation.y = x;
+            player.rotation.x = y;
+            player.rotation.z = -x;
         }
 
         for (const index in bullets) {
