@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel src/index.html",
-    "start2": "parcel src2/index.html",
-    "build": "parcel build src2/index.html",
+    "build": "parcel build src/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Tsai",
@@ -19,8 +18,12 @@
     "pepjs": "^0.5.2",
     "three": "^0.108.0"
   },
+  "staticFiles": {
+    "staticPath": "public"
+  },
   "devDependencies": {
     "parcel": "^1.12.3",
+    "parcel-plugin-static-files-copy": "^2.2.1",
     "typescript": "^3.6.3"
   }
 }

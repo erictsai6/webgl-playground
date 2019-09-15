@@ -11,7 +11,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-import { Color3 } from "@babylonjs/core"
+import { Color3, CubeTexture, Texture } from "@babylonjs/core"
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import {OimoJSPlugin} from "@babylonjs/core/Physics/Plugins/oimoJSPlugin"
 import {GridMaterial} from  "@babylonjs/materials/grid"
@@ -30,7 +30,7 @@ const engine = new Engine(canvas);
 var scene = new Scene(engine);
 
 // This creates and positions a free camera (non-mesh)
-var camera = new ArcRotateCamera("camera1", 5, 5, 5, new Vector3(0, 5, -10), scene)
+var camera = new ArcRotateCamera("camera1", 5, 5, 5, new Vector3(0, 2, -20), scene)
 // var camera = new ArcRotateCamera("camera1", new Vector3(0, 5, -10), scene);
 
 // This targets the camera to scene origin
@@ -67,7 +67,7 @@ sphere.position.y = 1;
 sphere.material = myMaterial;
 
 // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
-var ground = Mesh.CreateGround("ground1", 10, 10, 2, scene);
+var ground = Mesh.CreateGround("ground1", 25, 25, 2, scene);
 ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.5, restitution: 0.7 }, scene);
 
 var material = new GridMaterial("grid", scene);
@@ -76,6 +76,18 @@ scene.collisionsEnabled = true;
 // Affect a material
 ground.material = material;
 ground.checkCollisions = true;
+
+var skybox = Mesh.CreateBox("skyBox", 800, scene);
+var skyboxMaterial = new StandardMaterial("skyBox", scene);
+skyboxMaterial.backFaceCulling = false;
+skyboxMaterial.disableLighting = true;
+skyboxMaterial.reflectionTexture  = new CubeTexture("img/skybox/skybox", scene);;
+skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+skybox.material = skyboxMaterial;
+
+skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
+skyboxMaterial.specularColor = new Color3(0, 0, 0);
+skybox.infiniteDistance = true;
 
 function generateSpheres() {
     for (let i = 0; i < 100; i += 1) {
@@ -88,9 +100,6 @@ function generateSpheres() {
         sphere.material = myMaterial;
         sphere.checkCollisions = true;
         sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 0.1 }, scene);
-        // scene.registerBeforeRender(function () {
-        //     sphere.moveWithCollisions(scene.gravity);
-        // })
         
     }
 }
