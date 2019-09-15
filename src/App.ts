@@ -11,7 +11,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-import { Color3, CubeTexture, Texture } from "@babylonjs/core"
+import { Color3, CubeTexture, Texture, ActionManager, ExecuteCodeAction } from "@babylonjs/core"
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import {OimoJSPlugin} from "@babylonjs/core/Physics/Plugins/oimoJSPlugin"
 import {GridMaterial} from  "@babylonjs/materials/grid"
@@ -34,10 +34,11 @@ var camera = new ArcRotateCamera("camera1", 5, 5, 5, new Vector3(0, 2, -20), sce
 // var camera = new ArcRotateCamera("camera1", new Vector3(0, 5, -10), scene);
 
 // This targets the camera to scene origin
-camera.setTarget(Vector3.Zero());
+// camera.setTarget(Vector3.Zero());
+// camera.setPosition(new Vector3(0, 2, 10));
 
 // This attaches the camera to the canvas
-camera.attachControl(canvas, false);
+camera.attachControl(canvas, true);
 
 var gravityVector = new Vector3(0,-.81, 0);
 var physicsPlugin = new OimoJSPlugin();
@@ -58,13 +59,17 @@ myMaterial.diffuseColor = new Color3(0.5, 0.2, 1);
 // myMaterial.ambientColor = new Color3(0.23, 0.98, 0.53);
 
 // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-var sphere = Mesh.CreateSphere("sphere1", 16, 1, scene);
+var player = Mesh.CreateSphere("sphere1", 16, 1, scene);
 
+camera.setTarget(player);
 // Move the sphere upward 1/2 its height
-sphere.position.y = 1;
+player.position.y = 1;
 
 // Affect a material
-sphere.material = myMaterial;
+player.material = myMaterial;
+player.checkCollisions = true;
+player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9 }, scene);
+
 
 // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
 var ground = Mesh.CreateGround("ground1", 25, 25, 2, scene);
@@ -89,6 +94,21 @@ skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
 skyboxMaterial.specularColor = new Color3(0, 0, 0);
 skybox.infiniteDistance = true;
 
+var forceDirection = new Vector3(0, 1, 0);
+var forceMagnitude = 0.2;
+var contactLocalRefPoint = Vector3.Zero();
+
+var map = {}; //object for multiple key presses
+scene.actionManager = new ActionManager(scene);
+
+scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, function (evt) {
+    map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+}));
+
+scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, function (evt) {
+    map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
+}));
+
 function generateSpheres() {
     for (let i = 0; i < 100; i += 1) {
         var sphere = Mesh.CreateSphere("sphere" + i, 16, 0.2, scene);
@@ -104,9 +124,39 @@ function generateSpheres() {
     }
 }
 
+player.isJumping = false;
+function jump() {
+    player.isJumping = true;
+    player.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), player.getAbsolutePosition().add(contactLocalRefPoint));
+}
+
 generateSpheres();
 
 // Render every frame
 engine.runRenderLoop(() => {
     scene.render();
+});
+
+scene.registerAfterRender(function () {
+
+    if ((map["w"] || map["W"])) {
+        player.position.z += 0.1;
+    };
+
+    if ((map["s"] || map["S"])) {
+        player.position.z -= 0.1;
+    };
+
+    if ((map["a"] || map["A"])) {
+        player.position.x -= 0.1;
+
+    };
+
+    if ((map["d"] || map["D"])) {
+        player.position.x += 0.1;
+    };
+    if (map[" "]) {
+        jump();
+    }
+
 });
