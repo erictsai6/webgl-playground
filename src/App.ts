@@ -19,6 +19,7 @@ import {PhysicsImpostor} from "@babylonjs/core/Physics/physicsImpostor"
 
 // Required side effects to populate the Create methods on the mesh class. Without this, the bundle would be smaller but the createXXX methods from mesh would not be accessible.
 import "@babylonjs/core/Meshes/meshBuilder";
+import { RED, PINK, LIGHT_BLUE, LIGHT_GREEN, generateColorMaterial } from './constants/colors';
 
 // Get the canvas element from the DOM.
 const canvas = document.getElementById("c") as HTMLCanvasElement;
@@ -72,7 +73,7 @@ player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpos
 
 
 // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
-var ground = Mesh.CreateGround("ground1", 25, 25, 2, scene);
+var ground = Mesh.CreateGround("ground1", 50, 1000, 2, scene);
 ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.5, restitution: 0.7 }, scene);
 
 var material = new GridMaterial("grid", scene);
@@ -95,7 +96,7 @@ skyboxMaterial.specularColor = new Color3(0, 0, 0);
 skybox.infiniteDistance = true;
 
 var forceDirection = new Vector3(0, 1, 0);
-var forceMagnitude = 0.2;
+var forceMagnitude = 0.5;
 var contactLocalRefPoint = Vector3.Zero();
 
 var map = {}; //object for multiple key presses
@@ -110,24 +111,49 @@ scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTr
 }));
 
 function generateSpheres() {
-    for (let i = 0; i < 100; i += 1) {
-        var sphere = Mesh.CreateSphere("sphere" + i, 16, 0.2, scene);
+    var sphere = Mesh.CreateSphere("sphere0", 16, 0.9, scene);
 
-        sphere.position.y = Math.random() * 5;
-        sphere.position.x = (Math.random() * 10) - 5;
-        sphere.position.z = (Math.random() * 10) - 5;
+    sphere.position.y = 1
+    sphere.position.x = 2
+    sphere.position.z = 0
 
-        sphere.material = myMaterial;
-        sphere.checkCollisions = true;
-        sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 0.1 }, scene);
-        
-    }
+    sphere.material = generateColorMaterial(RED, scene);
+
+    sphere = Mesh.CreateSphere("sphere1", 16, 0.7, scene);
+
+    sphere.position.y = 1
+    sphere.position.x = 0
+    sphere.position.z = 2
+
+    sphere.material = generateColorMaterial(PINK, scene);
+
+    sphere = Mesh.CreateSphere("sphere1", 16, 0.5, scene);
+
+    sphere.position.y = 1
+    sphere.position.x = -2
+    sphere.position.z = 0
+
+    sphere.material = generateColorMaterial(LIGHT_BLUE, scene);
+
+    sphere = Mesh.CreateSphere("sphere1", 16, 0.3, scene);
+
+    sphere.position.y = 1
+    sphere.position.x = 0
+    sphere.position.z = -2
+
+    sphere.material = generateColorMaterial(LIGHT_GREEN, scene);
+    
 }
 
-player.isJumping = false;
+let maxSpeed = 0.75;
+let accelerate = 0.05;
+
 function jump() {
-    player.isJumping = true;
-    player.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), player.getAbsolutePosition().add(contactLocalRefPoint));
+
+    // Only jump if you are on the ground
+    if (player.intersectsMesh(ground)) {
+        player.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), player.getAbsolutePosition().add(contactLocalRefPoint));
+    }
 }
 
 generateSpheres();
@@ -137,23 +163,82 @@ engine.runRenderLoop(() => {
     scene.render();
 });
 
-scene.registerAfterRender(function () {
+let speed = 0;
+let direction = null;
 
+function determineRadius() {
+    const {x: cameraX, z: cameraZ} = camera.position;
+    const {x: targetX, z: targetZ} = camera.target;
+    // console.log(targetX, targetZ);
+
+    const x = cameraX - targetX;
+    const z = cameraZ - targetZ;
+    let angle = Math.atan(
+        Math.abs(z) / Math.abs(x));
+
+    // If quadrant 1
+    if (x > 0 && z > 0) {
+        angle = Math.PI + angle;
+    } else if (x > 0 && z < 0) {
+        angle = Math.PI - angle;
+    } else if (x < 0 && z < 0) {
+        angle = 0 + angle;
+    } else if (x < 0 && z > 0) {
+        angle = Math.PI * 2 - angle;
+    }
+    return angle;
+}
+
+function calculatePlayerPosition(speed, angle, player) {
+    //SOH CAH TOA
+    angle = angle % (2 * Math.PI);
+    const deltaZ = Math.sin(angle) * speed;
+    const deltaX = Math.cos(angle) * speed;
+    player.position.x += deltaX;
+    player.position.z += deltaZ;
+}
+
+let index = 0;
+scene.registerAfterRender(function () {
+    const angle = determineRadius();
+    index++;
+
+    const isOnGround = player.intersectsMesh(ground);
     if ((map["w"] || map["W"])) {
-        player.position.z += 0.1;
-    };
+        
+        speed += accelerate;
+        speed = Math.min(speed, maxSpeed);
+
+        calculatePlayerPosition(speed, angle, player);
+        direction = 'w';
+    }
 
     if ((map["s"] || map["S"])) {
-        player.position.z -= 0.1;
+        
+        speed += accelerate;
+        speed = Math.min(speed, maxSpeed);
+        calculatePlayerPosition(speed, angle + Math.PI, player);
+        direction = 's';
     };
 
     if ((map["a"] || map["A"])) {
-        player.position.x -= 0.1;
-
+        if (direction !== 's') {
+            speed = 0;
+        } 
+        speed += accelerate;
+        speed = Math.min(speed, maxSpeed);
+        calculatePlayerPosition(speed, angle + Math.PI / 2, player);
+        direction = 'a';
     };
 
     if ((map["d"] || map["D"])) {
-        player.position.x += 0.1;
+        if (direction !== 'd') {
+            speed = 0;
+        } 
+        speed += accelerate;
+        speed = Math.min(speed, maxSpeed);
+        calculatePlayerPosition(speed, angle - Math.PI / 2, player);
+        direction = 'd';
     };
     if (map[" "]) {
         jump();
