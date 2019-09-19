@@ -1,19 +1,17 @@
 import 'pepjs';
-import * as OIMO from 'oimo';
-window.OIMO = OIMO;
+import CANNON from 'cannon';
+window.CANNON = CANNON;
 
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-import { Color3, CubeTexture, Texture, ActionManager, ExecuteCodeAction } from "@babylonjs/core"
+import { Color3, CubeTexture, Texture, ActionManager, ExecuteCodeAction, CannonJSPlugin } from "@babylonjs/core"
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import {OimoJSPlugin} from "@babylonjs/core/Physics/Plugins/oimoJSPlugin"
 import {GridMaterial} from  "@babylonjs/materials/grid"
 import {PhysicsImpostor} from "@babylonjs/core/Physics/physicsImpostor"
 
@@ -33,6 +31,8 @@ var scene = new Scene(engine);
 // This creates and positions a free camera (non-mesh)
 var camera = new ArcRotateCamera("camera1", 5, 5, 5, new Vector3(0, 2, -20), scene)
 // var camera = new ArcRotateCamera("camera1", new Vector3(0, 5, -10), scene);
+camera.lowerBetaLimit = 0.01;
+camera.upperBetaLimit = (Math.PI / 2) * 0.9;
 
 // This targets the camera to scene origin
 // camera.setTarget(Vector3.Zero());
@@ -41,9 +41,10 @@ var camera = new ArcRotateCamera("camera1", 5, 5, 5, new Vector3(0, 2, -20), sce
 // This attaches the camera to the canvas
 camera.attachControl(canvas, true);
 
-var gravityVector = new Vector3(0,-.81, 0);
-var physicsPlugin = new OimoJSPlugin();
-scene.enablePhysics(gravityVector, physicsPlugin);
+var gravityVector = new Vector3(0, -9.8, 0);
+scene.enablePhysics(gravityVector, new CannonJSPlugin());
+
+// scene.enablePhysics(gravityVector, physicsPlugin);
 
 // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
 var light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
@@ -59,29 +60,33 @@ myMaterial.diffuseColor = new Color3(0.5, 0.2, 1);
 // myMaterial.emissiveColor = new Color3(1, 0, 1);
 // myMaterial.ambientColor = new Color3(0.23, 0.98, 0.53);
 
-// Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-var player = Mesh.CreateSphere("sphere1", 16, 1, scene);
-
-camera.setTarget(player);
-// Move the sphere upward 1/2 its height
-player.position.y = 1;
-
-// Affect a material
-player.material = myMaterial;
-player.checkCollisions = true;
-player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9 }, scene);
-
+var player;
 
 // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
-var ground = Mesh.CreateGround("ground1", 50, 1000, 2, scene);
-ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.5, restitution: 0.7 }, scene);
+var ground = Mesh.CreateGroundFromHeightMap("ground1", "img/heightmap/nyc.png",  500, 500, 250, 0, 10, scene, false, function() {
+    const material = new GridMaterial('grid', scene);
+    ground.material = material;
+    ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.HeightmapImpostor, 
+        { mass: 0, friction: 0.5, restitution: 0.3 }, scene);
+    ground.checkCollisions = true;
+    // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+    player = Mesh.CreateSphere("sphere1", 16, 1, scene);
 
-var material = new GridMaterial("grid", scene);
-scene.collisionsEnabled = true;
+    camera.setTarget(player);
+    // Move the sphere upward 1/2 its height
+    player.position.y = 3;
+
+    // Affect a material
+    player.material = myMaterial;
+    player.checkCollisions = true;
+    player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9 }, scene);
+
+});
+
+// scene.collisionsEnabled = true;
 
 // Affect a material
-ground.material = material;
-ground.checkCollisions = true;
+// ground.material = material;
 
 var skybox = Mesh.CreateBox("skyBox", 800, scene);
 var skyboxMaterial = new StandardMaterial("skyBox", scene);
@@ -203,7 +208,6 @@ scene.registerAfterRender(function () {
     const angle = determineRadius();
     index++;
 
-    const isOnGround = player.intersectsMesh(ground);
     if ((map["w"] || map["W"])) {
         
         speed += accelerate;
@@ -222,9 +226,6 @@ scene.registerAfterRender(function () {
     };
 
     if ((map["a"] || map["A"])) {
-        if (direction !== 's') {
-            speed = 0;
-        } 
         speed += accelerate;
         speed = Math.min(speed, maxSpeed);
         calculatePlayerPosition(speed, angle + Math.PI / 2, player);
@@ -232,9 +233,6 @@ scene.registerAfterRender(function () {
     };
 
     if ((map["d"] || map["D"])) {
-        if (direction !== 'd') {
-            speed = 0;
-        } 
         speed += accelerate;
         speed = Math.min(speed, maxSpeed);
         calculatePlayerPosition(speed, angle - Math.PI / 2, player);
@@ -243,5 +241,14 @@ scene.registerAfterRender(function () {
     if (map[" "]) {
         jump();
     }
+    if (player && player.position.y < ground.position.y - 20) {
+        player.position = new Vector3(0, 5, 0);
+        // kill all positional movement
+        player.physicsImpostor.setLinearVelocity(new Vector3(1, 0, 0));
+        // kill all rotational movement
+        player.physicsImpostor.setAngularVelocity(new Vector3(0, 0, 0));
+});
 
+window.addEventListener("resize", function () { 
+    engine.resize();
 });
