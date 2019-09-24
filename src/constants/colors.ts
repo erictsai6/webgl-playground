@@ -12,10 +12,13 @@ export const LIGHT_BLUE = new Color3(0.17, 0.66, 0.6);
 //rgb(85, 165, 44)
 export const LIGHT_GREEN = new Color3(0.33, 0.64, .17);
 
+//rgb(114, 71, 71)
+
+export const BROWN = new Color3(0.44, .278, .278);
 
 export function generateColorMaterial(color: Color3, scene): StandardMaterial {
     index++;
     const material = new StandardMaterial(`colorMaterial${index}`, scene);
     material.diffuseColor = color;
-    return material;
+    return material;aaaaa
 }

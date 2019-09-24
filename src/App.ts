@@ -17,7 +17,7 @@ import {PhysicsImpostor} from "@babylonjs/core/Physics/physicsImpostor"
 
 // Required side effects to populate the Create methods on the mesh class. Without this, the bundle would be smaller but the createXXX methods from mesh would not be accessible.
 import "@babylonjs/core/Meshes/meshBuilder";
-import { RED, PINK, LIGHT_BLUE, LIGHT_GREEN, generateColorMaterial } from './constants/colors';
+import { RED, PINK, BROWN, LIGHT_BLUE, LIGHT_GREEN, generateColorMaterial } from './constants/colors';
 
 // Get the canvas element from the DOM.
 const canvas = document.getElementById("c") as HTMLCanvasElement;
@@ -55,7 +55,9 @@ light.intensity = 0.5;
 // Create a grid material
 var myMaterial = new StandardMaterial("myMaterial", scene);
 
-myMaterial.diffuseColor = new Color3(0.5, 0.2, 1);
+myMaterial.diffuseTexture = new Texture("http://i.imgur.com/Wk1cGEq.png", scene);
+
+// myMaterial.diffuseColor = new Color3(0.5, 0.2, 1);
 // myMaterial.specularColor = new Color3(0.5, 0.6, 0.87);
 // myMaterial.emissiveColor = new Color3(1, 0, 1);
 // myMaterial.ambientColor = new Color3(0.23, 0.98, 0.53);
@@ -64,13 +66,20 @@ var player;
 
 // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
 var ground = Mesh.CreateGroundFromHeightMap("ground1", "img/heightmap/nyc.png",  500, 500, 250, 0, 10, scene, false, function() {
-    const material = new GridMaterial('grid', scene);
+    // const material = new GridMaterial('grid', scene);
+    var material = new StandardMaterial("mat1", scene);
+    material.diffuseTexture = new Texture("http://i.imgur.com/Wk1cGEq.png", scene);
+    material.bumpTexture  = new Texture("http://i.imgur.com/wGyk6os.png", scene);
+    material.diffuseTexture.uScale = 30;
+    material.diffuseTexture.vScale = 30;
+
+    // material.specularColor = new Color3(0, 0, 0);
     ground.material = material;
     ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.HeightmapImpostor, 
         { mass: 0, friction: 0.5, restitution: 0.3 }, scene);
     ground.checkCollisions = true;
     // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-    player = Mesh.CreateSphere("sphere1", 16, 1, scene);
+    player = Mesh.CreateSphere("sphere1", 16, 2, scene);
 
     camera.setTarget(player);
     // Move the sphere upward 1/2 its height
@@ -79,7 +88,7 @@ var ground = Mesh.CreateGroundFromHeightMap("ground1", "img/heightmap/nyc.png", 
     // Affect a material
     player.material = myMaterial;
     player.checkCollisions = true;
-    player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9 }, scene);
+    player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9, friction: 0.5 }, scene);
 
 });
 
@@ -96,9 +105,10 @@ skyboxMaterial.reflectionTexture  = new CubeTexture("img/skybox/skybox", scene);
 skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
 skybox.material = skyboxMaterial;
 
-skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
-skyboxMaterial.specularColor = new Color3(0, 0, 0);
+// skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
+// skyboxMaterial.specularColor = new Color3(0, 0, 0);
 skybox.infiniteDistance = true;
+
 
 var forceDirection = new Vector3(0, 1, 0);
 var forceMagnitude = 0.5;
@@ -106,6 +116,10 @@ var contactLocalRefPoint = Vector3.Zero();
 
 var map = {}; //object for multiple key presses
 scene.actionManager = new ActionManager(scene);
+
+// scene.fogMode = Scene.FOGMODE_EXP;
+// scene.fogColor = new Color3(0.9, 0.9, 0.85);
+// scene.fogDensity = 0.01;
 
 scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyDownTrigger, function (evt) {
     map[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
@@ -150,8 +164,8 @@ function generateSpheres() {
     
 }
 
-let maxSpeed = 0.75;
-let accelerate = 0.05;
+let maxSpeed = 20;
+let accelerate = 0.5;
 
 function jump() {
 
@@ -199,47 +213,75 @@ function calculatePlayerPosition(speed, angle, player) {
     angle = angle % (2 * Math.PI);
     const deltaZ = Math.sin(angle) * speed;
     const deltaX = Math.cos(angle) * speed;
-    player.position.x += deltaX;
-    player.position.z += deltaZ;
+
+    // player.position.x += deltaX;
+    // player.position.z += deltaZ;
+    const currentVelocity = player.physicsImpostor.getLinearVelocity();
+    currentVelocity.x = deltaX;
+    currentVelocity.z = deltaZ;
+    player.physicsImpostor.setLinearVelocity(currentVelocity);
+    player.physicsImpostor.setAngularVelocity(currentVelocity);
+}
+
+function limitMaxSpeed(coordinate: number) {
+    if (coordinate < 0) {
+        return Math.max(-maxSpeed, coordinate);
+    }
+    return Math.min(maxSpeed, coordinate);
+}
+
+function decelerate() {
+    
+    const currentVelocity = player.physicsImpostor.getLinearVelocity();
+
+    currentVelocity.x = currentVelocity.x / 8;
+    currentVelocity.x = currentVelocity.x < 0.05 ? 0 : currentVelocity.x;
+
+    currentVelocity.z = currentVelocity.z / 8;
+    currentVelocity.z = currentVelocity.z < 0.05 ? 0 : currentVelocity.z;
+
+    player.physicsImpostor.setLinearVelocity(currentVelocity);
 }
 
 let index = 0;
 scene.registerAfterRender(function () {
-    const angle = determineRadius();
+    if (!player) {return}
+    const facingAngle = determineRadius();
+    let angles = [];
     index++;
+    let isMoving = false;
 
     if ((map["w"] || map["W"])) {
-        
-        speed += accelerate;
-        speed = Math.min(speed, maxSpeed);
-
-        calculatePlayerPosition(speed, angle, player);
-        direction = 'w';
+        isMoving = true;
+        angles.push(facingAngle);
     }
 
     if ((map["s"] || map["S"])) {
-        
-        speed += accelerate;
-        speed = Math.min(speed, maxSpeed);
-        calculatePlayerPosition(speed, angle + Math.PI, player);
-        direction = 's';
+        isMoving = true;
+        angles.push(facingAngle + Math.PI);    
     };
 
     if ((map["a"] || map["A"])) {
-        speed += accelerate;
-        speed = Math.min(speed, maxSpeed);
-        calculatePlayerPosition(speed, angle + Math.PI / 2, player);
-        direction = 'a';
+        isMoving = true;
+        angles.push(facingAngle + Math.PI / 2);    
     };
 
     if ((map["d"] || map["D"])) {
+        isMoving = true;
+        angles.push(facingAngle - Math.PI / 2);    
+    };
+    if (isMoving) {
         speed += accelerate;
         speed = Math.min(speed, maxSpeed);
-        calculatePlayerPosition(speed, angle - Math.PI / 2, player);
-        direction = 'd';
-    };
+        const average = angles.reduce((prev, x) => prev + x, 0) / angles.length;
+
+        calculatePlayerPosition(speed, average, player);
+    }
     if (map[" "]) {
         jump();
+    }
+    if (!isMoving) {
+        decelerate();
     }
     if (player && player.position.y < ground.position.y - 20) {
         player.position = new Vector3(0, 5, 0);
