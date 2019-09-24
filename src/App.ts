@@ -10,7 +10,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-import { Color3, CubeTexture, Texture, ActionManager, ExecuteCodeAction, CannonJSPlugin } from "@babylonjs/core"
+import { Color3, CubeTexture, Texture, ActionManager, ExecuteCodeAction, CannonJSPlugin, Ray, RayHelper } from "@babylonjs/core"
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import {GridMaterial} from  "@babylonjs/materials/grid"
 import {PhysicsImpostor} from "@babylonjs/core/Physics/physicsImpostor"
@@ -41,7 +41,8 @@ camera.upperBetaLimit = (Math.PI / 2) * 0.9;
 // This attaches the camera to the canvas
 camera.attachControl(canvas, true);
 
-var gravityVector = new Vector3(0, -9.8, 0);
+const GRAVITY = -9.8;
+var gravityVector = new Vector3(0, GRAVITY, 0);
 scene.enablePhysics(gravityVector, new CannonJSPlugin());
 
 // scene.enablePhysics(gravityVector, physicsPlugin);
@@ -65,32 +66,43 @@ myMaterial.diffuseTexture = new Texture("http://i.imgur.com/Wk1cGEq.png", scene)
 var player;
 
 // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
-var ground = Mesh.CreateGroundFromHeightMap("ground1", "img/heightmap/nyc.png",  500, 500, 250, 0, 10, scene, false, function() {
-    // const material = new GridMaterial('grid', scene);
-    var material = new StandardMaterial("mat1", scene);
-    material.diffuseTexture = new Texture("http://i.imgur.com/Wk1cGEq.png", scene);
-    material.bumpTexture  = new Texture("http://i.imgur.com/wGyk6os.png", scene);
-    material.diffuseTexture.uScale = 30;
-    material.diffuseTexture.vScale = 30;
+// var ground = Mesh.CreateGroundFromHeightMap("ground1", "img/heightmap/nyc.png",  500, 500, 250, 0, 10, scene, false, function() {
+//     // const material = new GridMaterial('grid', scene);
+//     var material = new StandardMaterial("mat1", scene);
+//     material.diffuseTexture = new Texture("http://i.imgur.com/Wk1cGEq.png", scene);
+//     material.bumpTexture  = new Texture("http://i.imgur.com/wGyk6os.png", scene);
+//     material.diffuseTexture.uScale = 30;
+//     material.diffuseTexture.vScale = 30;
 
-    // material.specularColor = new Color3(0, 0, 0);
-    ground.material = material;
-    ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.HeightmapImpostor, 
-        { mass: 0, friction: 0.5, restitution: 0.3 }, scene);
-    ground.checkCollisions = true;
-    // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
-    player = Mesh.CreateSphere("sphere1", 16, 2, scene);
+//     // material.specularColor = new Color3(0, 0, 0);
+//     ground.material = material;
+//     ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.HeightmapImpostor, 
+//         { mass: 0, friction: 0.5, restitution: 0.3 }, scene);
+//     ground.checkCollisions = true;
+//     // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+//     player = Mesh.CreateSphere("sphere1", 16, 2, scene);
 
-    camera.setTarget(player);
-    // Move the sphere upward 1/2 its height
-    player.position.y = 3;
+//     camera.setTarget(player);
+//     // Move the sphere upward 1/2 its height
+//     player.position.y = 8;
 
-    // Affect a material
-    player.material = myMaterial;
-    player.checkCollisions = true;
-    player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9, friction: 0.5 }, scene);
+//     // Affect a material
+//     player.material = myMaterial;
+//     player.checkCollisions = true;
+//     player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9, friction: 0.5 }, scene);
 
-});
+// });
+
+player = Mesh.CreateSphere("sphere1", 16, 2, scene);
+
+camera.setTarget(player);
+// Move the sphere upward 1/2 its height
+player.position.y = 8;
+
+// Affect a material
+player.material = myMaterial;
+player.checkCollisions = true;
+player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 0.9, friction: 0.5 }, scene);
 
 // scene.collisionsEnabled = true;
 
@@ -130,7 +142,7 @@ scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTr
 }));
 
 function generateSpheres() {
-    var sphere = Mesh.CreateSphere("sphere0", 16, 0.9, scene);
+    var sphere = Mesh.CreateSphere("player", 16, 0.9, scene);
 
     sphere.position.y = 1
     sphere.position.x = 2
@@ -167,14 +179,52 @@ function generateSpheres() {
 let maxSpeed = 20;
 let accelerate = 0.5;
 
-function jump() {
+let platforms = [];
+function generatePlatforms() {
+    for (let i = 0; i < 10; i++) {
+        const platform = Mesh.CreateBox(`platform_${i}`, 10, scene);
+        
+        platform.position.y = 3;
+        platform.position.x = (i) * 10;
+        platform.position.z = (i) * 16
 
-    // Only jump if you are on the ground
-    if (player.intersectsMesh(ground)) {
-        player.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), player.getAbsolutePosition().add(contactLocalRefPoint));
+        // Affect a material
+        platform.material = generateColorMaterial(BROWN, scene);
+        platform.checkCollisions = true;
+        platform.physicsImpostor = new PhysicsImpostor(platform, PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.5 }, scene);
+        // platform.physicsImpostor.applyForce(new Vector3(0, -GRAVITY, 0), platform.getAbsolutePosition().add(contactLocalRefPoint));
+        platforms.push(platform);
     }
 }
 
+const ray = new Ray(new Vector3(0, 100, 0), new Vector3(0, -1, 0), 1000);
+const rayHelper = RayHelper.CreateAndShow(ray, scene, new Color3(1,1, 0.1));
+
+function jump() {
+    // Raycast vertically down
+    const { x, z } = player.position;
+    console.log(player.position);
+    ray.origin.x = x;
+    ray.origin.z = z;
+
+    const hits = (scene as any).multiPickWithRay(ray);
+    for (let hit of hits) {
+        // Get player 
+        if (hit.pickedMesh.name === "player") {
+            player = hit.pickedMesh;
+        }
+
+        // Get platform if exists
+    }
+
+    console.log(hits);
+    // Only jump if you are on the ground
+    // if (player.intersectsMesh(ground)) {
+    //     player.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), player.getAbsolutePosition().add(contactLocalRefPoint));
+    // }
+}
+
+generatePlatforms();
 generateSpheres();
 
 // Render every frame
@@ -283,7 +333,7 @@ scene.registerAfterRender(function () {
     if (!isMoving) {
         decelerate();
     }
-    if (player && player.position.y < ground.position.y - 20) {
+    if (player && player.position.y < -20) {
         player.position = new Vector3(0, 5, 0);
         // kill all positional movement
         player.physicsImpostor.setLinearVelocity(new Vector3(1, 0, 0));

@@ -20,5 +20,5 @@ export function generateColorMaterial(color: Color3, scene): StandardMaterial {
     index++;
     const material = new StandardMaterial(`colorMaterial${index}`, scene);
     material.diffuseColor = color;
-    return material;aaaaa
+    return material;
 }
