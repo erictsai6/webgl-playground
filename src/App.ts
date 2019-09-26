@@ -93,11 +93,13 @@ var player;
 
 // });
 
-player = Mesh.CreateSphere("sphere1", 16, 2, scene);
+const PLAYER_HEIGHT = 2;
+player = Mesh.CreateSphere("player", 16, PLAYER_HEIGHT, scene);
+
 
 camera.setTarget(player);
 // Move the sphere upward 1/2 its height
-player.position.y = 8;
+player.position.y = 10;
 
 // Affect a material
 player.material = myMaterial;
@@ -123,7 +125,7 @@ skybox.infiniteDistance = true;
 
 
 var forceDirection = new Vector3(0, 1, 0);
-var forceMagnitude = 0.5;
+var forceMagnitude = 5.0;
 var contactLocalRefPoint = Vector3.Zero();
 
 var map = {}; //object for multiple key presses
@@ -142,35 +144,35 @@ scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTr
 }));
 
 function generateSpheres() {
-    var sphere = Mesh.CreateSphere("player", 16, 0.9, scene);
+    var sphere = Mesh.CreateBox("box1", 1, scene);
 
     sphere.position.y = 1
-    sphere.position.x = 2
+    sphere.position.x = 6
     sphere.position.z = 0
 
     sphere.material = generateColorMaterial(RED, scene);
 
-    sphere = Mesh.CreateSphere("sphere1", 16, 0.7, scene);
+    sphere = Mesh.CreateBox("sphere2", 1, scene);
 
     sphere.position.y = 1
     sphere.position.x = 0
-    sphere.position.z = 2
+    sphere.position.z = 6
 
     sphere.material = generateColorMaterial(PINK, scene);
 
-    sphere = Mesh.CreateSphere("sphere1", 16, 0.5, scene);
+    sphere = Mesh.CreateBox("sphere3", 1,  scene);
 
     sphere.position.y = 1
-    sphere.position.x = -2
+    sphere.position.x = -6
     sphere.position.z = 0
 
     sphere.material = generateColorMaterial(LIGHT_BLUE, scene);
 
-    sphere = Mesh.CreateSphere("sphere1", 16, 0.3, scene);
+    sphere = Mesh.CreateBox("sphere4", 1, scene);
 
     sphere.position.y = 1
     sphere.position.x = 0
-    sphere.position.z = -2
+    sphere.position.z = -6
 
     sphere.material = generateColorMaterial(LIGHT_GREEN, scene);
     
@@ -197,31 +199,35 @@ function generatePlatforms() {
     }
 }
 
-const ray = new Ray(new Vector3(0, 100, 0), new Vector3(0, -1, 0), 1000);
-const rayHelper = RayHelper.CreateAndShow(ray, scene, new Color3(1,1, 0.1));
+const ray = new Ray(new Vector3(0, 100, 0), new Vector3(0, -1, 0), 400);
 
-function jump() {
-    // Raycast vertically down
+function isOnGround() {
     const { x, z } = player.position;
-    console.log(player.position);
     ray.origin.x = x;
     ray.origin.z = z;
+    let playerHit;
+    let platformHit;
 
     const hits = (scene as any).multiPickWithRay(ray);
     for (let hit of hits) {
         // Get player 
         if (hit.pickedMesh.name === "player") {
-            player = hit.pickedMesh;
+            playerHit = hit.pickedPoint;
+        }
+        if (/^platform_/.test(hit.pickedMesh.name)) {
+            platformHit = hit.pickedPoint;
         }
 
-        // Get platform if exists
     }
+    return (playerHit && platformHit && 
+        Math.abs((playerHit.y - PLAYER_HEIGHT) - platformHit.y) < 0.1);
+}
 
-    console.log(hits);
-    // Only jump if you are on the ground
-    // if (player.intersectsMesh(ground)) {
-    //     player.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), player.getAbsolutePosition().add(contactLocalRefPoint));
-    // }
+function jump() {
+    // Raycast vertically down
+   if (playerIsOnGround) {
+        player.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), player.getAbsolutePosition().add(contactLocalRefPoint));        
+    }   
 }
 
 generatePlatforms();
@@ -258,19 +264,38 @@ function determineRadius() {
     return angle;
 }
 
+let previousAngle;
 function calculatePlayerPosition(speed, angle, player) {
     //SOH CAH TOA
-    angle = angle % (2 * Math.PI);
-    const deltaZ = Math.sin(angle) * speed;
-    const deltaX = Math.cos(angle) * speed;
+    const normalizedAngle = angle % (2 * Math.PI);
+    let deltaZ = Math.sin(normalizedAngle) * speed;
+    let deltaX = Math.cos(normalizedAngle) * speed;
 
-    // player.position.x += deltaX;
-    // player.position.z += deltaZ;
-    const currentVelocity = player.physicsImpostor.getLinearVelocity();
+    const currentVelocity = player.physicsImpostor.getLinearVelocity();    
+    if (!playerIsOnGround && previousAngle) {
+        const minBound = previousAngle - Math.PI / 8;
+        const maxBound = previousAngle + Math.PI / 8;
+        const oppositeDirection = (previousAngle + Math.PI) % (2 * Math.PI); 
+        const minOppBound = oppositeDirection - Math.PI / 8;
+        const maxOppBound = oppositeDirection + Math.PI / 8;
+        if (angle > minBound && angle < maxBound) {                        
+            previousAngle = angle;            
+        } else if (angle > minOppBound && angle < maxOppBound) {                
+            deltaX = currentVelocity.x / 4;
+            deltaZ = currentVelocity.z / 4;
+        } else {
+            deltaX = currentVelocity.x;
+            deltaZ = currentVelocity.zw;
+        }
+        
+    } else {
+        previousAngle = angle;
+
+    }
     currentVelocity.x = deltaX;
     currentVelocity.z = deltaZ;
     player.physicsImpostor.setLinearVelocity(currentVelocity);
-    player.physicsImpostor.setAngularVelocity(currentVelocity);
+    
 }
 
 function limitMaxSpeed(coordinate: number) {
@@ -294,8 +319,10 @@ function decelerate() {
 }
 
 let index = 0;
+let playerIsOnGround = false;
 scene.registerAfterRender(function () {
     if (!player) {return}
+    playerIsOnGround = isOnGround();
     const facingAngle = determineRadius();
     let angles = [];
     index++;
@@ -334,7 +361,7 @@ scene.registerAfterRender(function () {
         decelerate();
     }
     if (player && player.position.y < -20) {
-        player.position = new Vector3(0, 5, 0);
+        player.position = new Vector3(0, 10, 0);
         // kill all positional movement
         player.physicsImpostor.setLinearVelocity(new Vector3(1, 0, 0));
         // kill all rotational movement
