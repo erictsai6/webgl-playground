@@ -8,6 +8,7 @@ import * as GUI from 'babylonjs-gui';
 // Required side effects to populate the Create methods on the mesh class. Without this, the bundle would be smaller but the createXXX methods from mesh would not be accessible.
 import { createScene, createHeader } from './scene';
 import { loadAssets } from './asset-manager';
+import { AppActionManager } from './action-manager';
 window.CANNON = CANNON;
 
 BABYLON.SceneLoader.ShowLoadingScreen = false;
@@ -23,7 +24,7 @@ async function main() {
 
   var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI('ui1');
 
-  createHeader(advancedTexture);
+  createHeader(scene, advancedTexture);
 
   // AssetManager?
   await loadAssets(scene);
@@ -66,6 +67,9 @@ async function main() {
 
   scene.environmentTexture.lodGenerationScale = 0.6;
 
+  const actionManager = new AppActionManager(scene);
+  actionManager.registerActions();
+
   engine.runRenderLoop(() => {
     scene.render();
   });
@@ -73,6 +77,8 @@ async function main() {
   window.addEventListener('resize', function () {
     engine.resize();
   });
+  
+  window.scene = scene;
 }
 
 main();

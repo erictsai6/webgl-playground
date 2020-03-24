@@ -1,27 +1,24 @@
-import { Scene, Engine } from 'babylonjs';
-import * as GUI from 'babylonjs-gui';
+import { Scene, Engine, Mesh, Vector3 } from 'babylonjs';
 
+import { MeshWriter } from 'meshwriter';
 export function createScene(engine: Engine): Scene {
   return new Scene(engine);
 }
 
-export function createHeader(advancedTexture) {
-  var label = new GUI.Rectangle('label for me');
-  label.background = 'black'
-  label.height = '30px';
-  label.alpha = 0.5;
-  label.width = '100px';
-  label.cornerRadius = 20;
-  label.thickness = 1;
-  label.linkOffsetY = 30;
-  label.top = '10%';
-  label.zIndex = 5;
-  label.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-
-  var text1 = new GUI.TextBlock();
-  text1.text = 'tsaibot.dev';
-  text1.color = 'white';
-  label.addControl(text1);
-
-  advancedTexture.addControl(label);
+export function createHeader(scene: Scene) {
+  const Writer = MeshWriter(scene, { scale: 1 });
+  const text1 = new Writer(
+    'Erica',
+    {
+      anchor: 'center',
+      'letter-height': 25,
+      color: '#1C3870',
+      position: {
+        x: 10,
+        y: 15,
+        z: 20
+      }
+    }
+  );
+  (text1.getMesh() as Mesh).rotate(new Vector3(0, 10, 10), 10);
 }

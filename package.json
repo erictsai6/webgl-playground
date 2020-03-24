@@ -16,6 +16,7 @@
     "babylonjs-gui": "^4.1.0",
     "babylonjs-loaders": "^4.1.0",
     "cannon": "^0.6.2",
+    "meshwriter": "^1.2.3",
     "oimo": "^1.0.9",
     "pepjs": "^0.5.2",
     "three": "^0.108.0"
