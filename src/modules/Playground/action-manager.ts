@@ -25,6 +25,8 @@ export class AppActionManager {
       }
 
       if (isMoving) {
+        const fox = this.scene.meshes[1];
+        fox.position.z++;
         this.scene.animationGroups[1].play();
       }
     });

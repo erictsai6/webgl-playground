@@ -7,11 +7,13 @@
     "start": "parcel src/index.html",
     "build": "npm run lint && parcel build src/index.html",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "postinstall": "./scripts/postinstall.sh"
   },
   "author": "Eric Tsai",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.0",
     "babylonjs": "^4.1.0",
     "babylonjs-gui": "^4.1.0",
     "babylonjs-loaders": "^4.1.0",
@@ -19,6 +21,8 @@
     "meshwriter": "^1.2.3",
     "oimo": "^1.0.9",
     "pepjs": "^0.5.2",
+    "preact": "^10.3.4",
+    "preact-router": "^3.2.1",
     "three": "^0.108.0"
   },
   "staticFiles": {
@@ -27,14 +31,19 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
+    "autoprefixer": "^9.7.5",
     "eslint": "^6.8.0",
+    "eslint-config-preact": "^1.1.1",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "parcel": "^1.12.4",
+    "parcel-bundler": "^1.12.4",
     "parcel-plugin-static-files-copy": "^2.2.1",
+    "postcss-modules": "^1.5.0",
+    "tailwindcss": "^1.2.0",
     "typescript": "^3.6.3"
   }
 }
