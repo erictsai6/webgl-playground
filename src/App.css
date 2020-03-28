@@ -5,9 +5,11 @@ html body {
 :root {
     --primary-color: #ff8c42;
     --primary-alt1: #fcaf58;
-    --prmiary-alt2: #f9c784;
+    --primary-alt2: #f9c784;
     --white: #fff;
     --secondary-color: #4e598c;
+    --gray: #ebebeb;
+    --dark-gray: #666;
 }
 
 #c {

@@ -24,14 +24,9 @@ export class Header extends Component<any, State> {
   render()  {
     return (
       <Fragment>
-        <div className="fixed">
-          <Fire style={{transition: '.5s' }} 
-            className="fire-hamburger-icon ml-3 my-3 w-12 h-12 rounded-full p-2 shadow-lg fill-current cursor-pointer" 
-            onClick={this.toggleSidebar} />
-        </div>
         {this.state.showSidebar && 
-          <div className="navigation">      
-            <ul className="flex flex-col shadow-xl h-screen bg-orange-500 p-3">             
+          <div className="navigation fixed">      
+            <ul className="flex flex-col shadow-xl h-screen p-3 sm:w-full">             
               <li className="pr-6">
                 <a className="text-blue-500" href="/">Home</a>
               </li>       
@@ -44,6 +39,12 @@ export class Header extends Component<any, State> {
             </ul>
           </div>
         }  
+        <div className="fixed">
+          <Fire style={{transition: '.5s' }} 
+            className="fire-hamburger-icon ml-3 my-3 shadow-lg fill-current cursor-pointer" 
+            onClick={this.toggleSidebar} />
+        </div>
+        
       </Fragment>
     );
   }
