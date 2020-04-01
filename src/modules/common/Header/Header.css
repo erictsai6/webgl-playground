@@ -6,6 +6,8 @@
   @apply h-12;
   @apply rounded-full;
   @apply p-2;  
+  z-index: 5;
+  position:  fixed;
 }
 
 .fire-hamburger-icon:hover {
@@ -16,8 +18,14 @@
 }
 
 .navigation {
-  transition: 1s;
+  transition: 0.5s;
   background-color: var(--secondary-color);
   width: 250px;
   padding-top: 300px;
+  left: -100%;
+  position: fixed;
+}
+
+.navigation.open {
+  left: 0;
 }

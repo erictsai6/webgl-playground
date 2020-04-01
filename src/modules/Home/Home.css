@@ -1,0 +1,18 @@
+
+.three-d-skew {
+  transition: 0.5s;
+  transform: rotate3d(0, 1, 0, -45deg) translateX(50px);
+}
+
+.header-splash-title {
+  font-size: 4.5rem;
+  font-family: 'Ubuntu', sans-serif;
+  padding-top: 3rem;
+  color: var(--white);
+  text-shadow: 1px 1px var(--dark-gray);
+}
+
+.angle-down-icon {  
+  width: 1.5rem;
+  text-align: center;
+}
