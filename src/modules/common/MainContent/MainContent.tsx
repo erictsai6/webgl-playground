@@ -1,6 +1,8 @@
 import { h, ComponentChildren } from 'preact';
 import classnames from 'classnames';
 
+import './MainContent.css';
+
 type Props = {
   isHeaderOpen: boolean;
   scrollPosition: number;
@@ -19,7 +21,8 @@ export function MainContent(props: Props) {
   return (
     <div style={applyFixedScrollPositionStyle(props)} className={  
       classnames({
-        "three-d-skew": props.isHeaderOpen
+        "main-content": true,
+        shift: props.isHeaderOpen
       })} >
         { props.children }
     </div>);

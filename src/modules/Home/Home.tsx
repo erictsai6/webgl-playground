@@ -12,13 +12,28 @@ export const Home = () => (
           <AngleDown className="angle-down-icon" />
         </div>
       </div>
-      <div>
-        Welcome to Eric's personal site.  It started off as a webgl playground using Babylon but 
-        Elit est reprehenderit culpa aliqua. Mollit reprehenderit non amet do ex irure nisi dolor consectetur do consectetur. Laborum deserunt adipisicing exercitation nulla aute ipsum veniam. Excepteur elit sunt irure est non Lorem in proident. Sint aliquip eu aliqua pariatur non esse ex deserunt sint nisi incididunt tempor exercitation eu.
-        Laboris incididunt officia sunt mollit voluptate ut irure.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti minus quasi commodi, eum perspiciatis veniam qui natus et minima ullam, dolor ducimus animi nulla tempore. Totam aspernatur alias hic minus.
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minima fuga non soluta debitis, dicta recusandae doloremque quasi explicabo, quisquam libero nesciunt, exercitationem porro molestiae consectetur mollitia tenetur officia perspiciatis. Nesciunt!
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet quas iusto accusantium voluptatem earum ad enim. Ea, adipisci? Modi repellat esse soluta voluptate maiores natus nostrum non perferendis eum pariatur.
+      <div className="p-3 grid grid-cols-2 gap-3 justify-center">
+        <div>
+          Hi my name is Eric and I'm an engineering manager
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam, iusto? A, perferendis fugit quo soluta, ut dolore distinctio, laudantium quos et sequi adipisci sit deleniti ea sunt praesentium. Reiciendis, laudantium!
+        </div>
+        <div>
+          <img className="rounded-full m-auto" src="https://pbs.twimg.com/profile_images/523550536767791104/0VlhGMoQ_400x400.jpeg" alt="Tsaibot Twitter Profile Picture" />
+        </div>
+        <div>
+          <img className="rounded-full m-auto" src="https://pbs.twimg.com/profile_images/523550536767791104/0VlhGMoQ_400x400.jpeg" alt="Tsaibot Twitter Profile Picture" />
+        </div>
+        <div>
+          I've been in the industry 
+          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vero unde a sint omnis molestiae accusantium enim molestias sequi, dolores, doloremque aliquam laudantium. Provident quibusdam numquam optio, dignissimos soluta a libero?          
+        </div>
+        <div>
+          This started off as an experiment to play with WebGL technologies and quickly grew in scope when I realized that there weren't 
+          good tools available.  Navigate the header for more  content
+        </div>
+        <div>
+          <img className="rounded-full m-auto" src="https://pbs.twimg.com/profile_images/523550536767791104/0VlhGMoQ_400x400.jpeg" alt="Tsaibot Twitter Profile Picture" />
+        </div>       
       </div>
     </div>    
   </div>

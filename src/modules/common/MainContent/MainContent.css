@@ -1,3 +1,7 @@
-.three-d-skew {
-  
+.main-content {
+  transition: 1s;
+}
+
+.shift {
+  transform: translateX(250px);  
 }
