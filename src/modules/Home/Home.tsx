@@ -6,9 +6,16 @@ import { AngleDown } from '../common/Svg/Svg';
 export const Home = () => (
   <div>
     <div className="main-content flex flex-col" >
-      <div className="header-splash h-screen w-screen p-3 flex flex-col">
-        <h1 className="text-center header-splash-title flex-grow">tsaibot.dev</h1>
-        <div className="flex justify-center align-bottom">
+      <div className="header-splash h-screen w-screen">
+        <div className="panel left header-splash-title">
+          <div>tsai</div>
+          <div><br /></div>
+        </div>
+        <div className="panel right header-splash-title">
+          <div>bot</div>
+          <div>.dev</div>
+        </div>
+        <div className="see-more-container">
           <AngleDown className="angle-down-icon" />
         </div>
       </div>
