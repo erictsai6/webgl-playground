@@ -23,13 +23,6 @@ html body {
     height: 100%;
 }
 
-.header-splash {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: 90% 10%;
-    perspective: 500px;
-}
-
 @tailwind base;
 
 @tailwind components;
