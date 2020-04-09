@@ -1,10 +1,13 @@
 import Router from 'preact-router';
-import { h, render, Fragment, Component } from 'preact';
+import { h, Component } from 'preact';
+
 import { Home } from './modules/Home/Home';
 import { Playground } from './modules/Playground/Playground';
 import { Header } from './modules/common/Header/Header';
 import { Footer } from './modules/common/Footer';
 import { MainContent } from './modules/common/MainContent/MainContent';
+import { Webassembly } from './modules/Webassembly/Webassembly';
+import { Skybox } from './modules/Skybox/Skybox';
 
 type IAppState = {
   header: {
@@ -13,7 +16,7 @@ type IAppState = {
   };
 }
 
-class Main extends Component<any, IAppState> {
+export class App extends Component<any, IAppState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -49,9 +52,12 @@ class Main extends Component<any, IAppState> {
           open={state.header.open} />
         <MainContent isHeaderOpen={state.header.open} 
               scrollPosition={state.header.scrollPosition}>
-          <Router onChange={this.handleRoute}>
+          <Router 
+              onChange={this.handleRoute}>
             <Home path="/" />
             <Playground path="/playground" />
+            <Skybox path="/tools/skybox" />
+            <Webassembly path="/tools/webassembly" />
             {/* <About path="/about" />
                 // Advanced is an optional query
                 <Search path="/search/:query/:advanced?" /> */}
@@ -62,5 +68,3 @@ class Main extends Component<any, IAppState> {
     );
   }
 }
-
-render(<Main />, document.body);

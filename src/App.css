@@ -12,15 +12,14 @@ html body {
     --dark-gray: #666;
 }
 
-.app {
-    /* TODO(etsai) perspecti
-    ve breaks the position fixed for the navigation icons */
-    /* perspective: 1000px; */
-}
-
 #c {
     width: 100%;
     height: 100%;
+}
+
+.header-container-standard {
+    display: grid;
+    justify-items: center;
 }
 
 @tailwind base;

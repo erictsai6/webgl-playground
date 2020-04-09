@@ -2,8 +2,8 @@ import { h, Component } from 'preact';
 
 export class Skybox extends Component {
   render() {
-    <div>
+    return (<div>
       Skybox tool 
-    </div>
+    </div>);
   }
 }

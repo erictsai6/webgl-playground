@@ -19,17 +19,20 @@ export class Header extends Component<Props> {
         })}`}>      
           <ul className="flex flex-col shadow-xl h-screen p-3 sm:w-full">             
             <li className="pr-6">
-              <a className="text-blue-500" href="/">Home</a>
+              <a href="/">Home</a>
             </li>       
             <li className="pr-6">
               <a href="/playground">Game</a>        
             </li>
             <li className="pr-6">
-              <a href="/tools">Tools</a>        
+              <a href="/tools/skybox">Skybox</a>        
+            </li>
+            <li className="pr-6">
+              <a href="/tools/webassembly">Webassembly</a>        
             </li>
           </ul>
         </div>      
-        <Fire style={{transition: '.5s' }} 
+        <Fire 
           className="fire-hamburger-icon ml-3 my-3 shadow-lg fill-current cursor-pointer" 
           onClick={props.toggleHeader} />
         

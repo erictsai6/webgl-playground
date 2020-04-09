@@ -1,0 +1,24 @@
+{
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "targets": {
+          "node": "current",
+          "browsers": ["last 2 versions"]
+        }
+      }
+    ],
+    [
+      "@babel/preset-typescript",
+      {
+        "allExtensions": true,
+        "isTSX": true
+      }
+    ]
+  ],
+  "plugins": [
+    ["@babel/plugin-transform-react-jsx", { "pragma":"h" }]
+    
+  ]
+}

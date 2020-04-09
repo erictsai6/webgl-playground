@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="p-3">
       <ul>
         <li>
-          I customized the wicked cool background on my homepage at <a href="SVGBackgrounds.com">SVGBackgrounds.com.</a> 
+          footer tsaibot.dev {(new Date()).getFullYear()}
         </li>
       </ul>
     </footer>
