@@ -7,6 +7,7 @@
     "start": "parcel src/index.html",
     "build": "npm run lint && parcel build src/index.html",
     "build:wasm": "GOOS=js GOARCH=wasm go build -o game.wasm main.go",
+    "build:wasm:win": "go build -o ./public/wasm/game.wasm ./go/main.go",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.ts",
     "postinstall": "./scripts/postinstall.sh"
@@ -50,5 +51,8 @@
     "postcss-modules": "^1.5.0",
     "tailwindcss": "^1.2.0",
     "typescript": "^3.6.3"
-  }
+  },
+  "browserslist": [
+    "last 1 Chrome versions"
+  ]
 }

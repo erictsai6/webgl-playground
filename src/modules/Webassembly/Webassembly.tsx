@@ -1,6 +1,15 @@
 import { h, Component } from 'preact';
 
+import { calcPrimeSum } from '../../../rust/functions.rs';
+
 export class Webassembly extends Component {
+  componentDidMount() {
+    this.setState({
+      
+    })
+    console.log(calcPrimeSum(25));
+  }
+
   render() {
     return (<div className="p-3">
       <div className="header-container-standard">
