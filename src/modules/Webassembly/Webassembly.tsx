@@ -1,13 +1,18 @@
 import { h, Component } from 'preact';
 
-import { calcPrimeSum } from '../../../rust/functions.rs';
+import { calcPrimeSum } from '../../lib.rs';
 
 export class Webassembly extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      primeSum: 0
+    };
+  }
   componentDidMount() {
     this.setState({
-      
-    })
-    console.log(calcPrimeSum(25));
+      primeSum: calcPrimeSum(25)
+    });
   }
 
   render() {
@@ -16,7 +21,7 @@ export class Webassembly extends Component {
         <h1 className="text-2xl justify-center">Webassembly tool</h1>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        <div className=""></div>
+        <div className="">{this.state.primeSum}</div>
       </div>
     </div>);
   }
