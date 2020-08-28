@@ -33,9 +33,6 @@ export class Header extends Component<Props> {
             <li className="pr-6">   
               <a href="/tools/skybox">Skybox</a>        
             </li>
-            <li className="pr-6">
-              <a href="/tools/webassembly">Webassembly</a>        
-            </li>
           </ul>
         </div>      
         <Fire 

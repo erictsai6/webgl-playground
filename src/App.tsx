@@ -6,7 +6,6 @@ import { Playground } from './modules/Playground/Playground';
 import { Sudoku } from './modules/Sudoku/Sudoku';
 import { Header } from './modules/common/Header/Header';
 import { MainContent } from './modules/common/MainContent/MainContent';
-import { Webassembly } from './modules/Webassembly/Webassembly';
 import { Skybox } from './modules/Skybox/Skybox';
 
 type IAppState = {
@@ -58,7 +57,6 @@ export class App extends Component<any, IAppState> {
             <Playground path="/playground" />
             <Sudoku path="/sudoku" />
             <Skybox path="/tools/skybox" />
-            <Webassembly path="/tools/webassembly" />
             {/* <About path="/about" />
                 // Advanced is an optional query
                 <Search path="/search/:query/:advanced?" /> */}
