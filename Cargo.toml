@@ -1,0 +1,12 @@
+[package]
+name = "tsaibot"
+version = "0.1.0"
+authors = [ "Eric Tsai" ]
+edition = "2018"
+
+[dependencies]
+js-sys = "0.3.37"
+wasm-bindgen = "0.2.60"
+
+[lib]
+crate-type = [ "cdylib" ]

@@ -6,6 +6,8 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "npm run lint && parcel build src/index.html",
+    "build:wasm": "GOOS=js GOARCH=wasm go build -o game.wasm main.go",
+    "build:wasm:win": "go build -o ./public/wasm/game.wasm ./go/main.go",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.ts",
     "postinstall": "./scripts/postinstall.sh"
@@ -20,12 +22,13 @@
     "babylonjs-loaders": "^4.1.0",
     "cannon": "^0.6.2",
     "classnames": "^2.2.6",
+    "history": "^4.10.1",
     "meshwriter": "^1.2.3",
     "oimo": "^1.0.9",
     "pepjs": "^0.5.2",
     "preact": "^10.3.4",
+    "preact-render-to-string": "^5.1.5",
     "preact-router": "^3.2.1",
-    "redux": "^4.0.5",
     "three": "^0.108.0"
   },
   "staticFiles": {
@@ -48,5 +51,8 @@
     "postcss-modules": "^1.5.0",
     "tailwindcss": "^1.2.0",
     "typescript": "^3.6.3"
-  }
+  },
+  "browserslist": [
+    "last 1 Chrome versions"
+  ]
 }
