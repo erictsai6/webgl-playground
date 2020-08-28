@@ -25,6 +25,9 @@ export class Header extends Component<Props> {
               <a href="/playground">Game</a>        
             </li>
             <li className="pr-6">
+              <a href="/sudoku">Sudoku</a>        
+            </li>
+            <li className="pr-6">
               <a href="/tools">Tools</a>        
             </li>
           </ul>
