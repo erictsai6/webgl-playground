@@ -26,10 +26,7 @@ export class Header extends Component<Props> {
             </li>
             <li className="pr-6">
               <a href="/sudoku">Sudoku</a>        
-            </li>
-            <li className="pr-6">
-              <a href="/tools">Tools</a>     
-            </li>
+            </li>   
             <li className="pr-6">   
               <a href="/tools/skybox">Skybox</a>        
             </li>
