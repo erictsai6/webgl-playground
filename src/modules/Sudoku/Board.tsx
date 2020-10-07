@@ -1,6 +1,8 @@
 import { h, Component } from 'preact';
 import { SubBoard, SubBoardClass } from './SubBoard';
 
+import './Board.css';
+
 type Props = {
   subBoards: SubBoardClass[][];
   errors: number;

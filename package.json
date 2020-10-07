@@ -17,6 +17,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
     "@types/classnames": "^2.2.10",
+    "animate.css": "^4.1.1",
     "babylonjs": "^4.1.0",
     "babylonjs-gui": "^4.1.0",
     "babylonjs-loaders": "^4.1.0",

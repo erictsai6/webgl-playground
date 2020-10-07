@@ -1,26 +1,2 @@
-.board {
- padding: 10px;
-}
 
-.board-row {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
 
-.sub-board {
-  flex-grow: 1;
-  border: 1px  solid  black;
-}
-
-.sub-board-row {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
-
-.cell {
-  flex-grow: 1;
-  text-align: center;
-  padding: 5px;
-}

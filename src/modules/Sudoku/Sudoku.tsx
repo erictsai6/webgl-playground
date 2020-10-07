@@ -2,7 +2,6 @@ import { h, Component } from 'preact';
 
 import { Board } from './Board';
 import { SubBoardClass } from './SubBoard';
-import { getAvailableValues } from './utils';
 
 import './Sudoku.css';
 import { fillBoard } from './GameLogic';
@@ -32,18 +31,24 @@ export class Sudoku extends Component {
     };
   }
 
-  initializeBoard(): SubBoardClass[][] {    
-    const subBoards = [];
-    for (let i = 0; i < 3; i++) {
-      subBoards.push([]);
-      for (let j = 0; j < 3; j++) {
-        subBoards[i].push(this.initilizeSubBoard());
+  initializeBoard(): SubBoardClass[][] {  
+    for (let i = 0; i < 10; i++) {  
+      try {
+        const subBoards = [];
+        for (let i = 0; i < 3; i++) {
+          subBoards.push([]);
+          for (let j = 0; j < 3; j++) {
+            subBoards[i].push(this.initilizeSubBoard());
+          }
+        }
+
+        fillBoard(subBoards);
+
+        return subBoards;
+      } catch (err) {
+        console.error(err);
       }
     }
-
-    fillBoard(subBoards);
-
-    return subBoards;
   }
 
   resetBoard() {
@@ -99,7 +104,10 @@ export class Sudoku extends Component {
         </div>
       }
       <div>
-        <button onClick={()=>{this.initializeBoard()}} >New game</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={()=>{this.resetBoard()}}>
+            New game
+        </button>
       </div>
     </div>);
   }  

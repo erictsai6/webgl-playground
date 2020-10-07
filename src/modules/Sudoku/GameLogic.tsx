@@ -124,28 +124,21 @@ function calculateAvailableMovesPerCell(subBoards: SubBoardClass[][]) {
   }
 }
 
-export function fillBoard(subBoards: SubBoardClass[][]) {
-  for (let z = 0; z < 10; z++) {
-    try {
-      calculateAvailableMovesPerCell(subBoards);
-      let coordinate = getLeastAvailableMovesCellCoordinates(subBoards);
-      while (coordinate) {
-        const i =  Math.floor(coordinate.x / 3);
-        const j =  Math.floor(coordinate.y / 3);
-        const x =  coordinate.x % 3;
-        const y =  coordinate.y % 3;
-        const subBoard = subBoards[i][j];
-        const cell = subBoard.cells[x][y];
+export function fillBoard(subBoards: SubBoardClass[][]) {  
+  calculateAvailableMovesPerCell(subBoards);
+  let coordinate = getLeastAvailableMovesCellCoordinates(subBoards);
+  while (coordinate) {
+    const i =  Math.floor(coordinate.x / 3);
+    const j =  Math.floor(coordinate.y / 3);
+    const x =  coordinate.x % 3;
+    const y =  coordinate.y % 3;
+    const subBoard = subBoards[i][j];
+    const cell = subBoard.cells[x][y];
 
-        const randomIndex = Math.floor(Math.random() * cell.availableValues.length);
-        cell.value = cell.availableValues[randomIndex];
-        cell.availableValues = [];
-        calculateAvailableMovesPerCell(subBoards);
-        coordinate = getLeastAvailableMovesCellCoordinates(subBoards);
-      }  
-      break;
-    } catch (err) {
-      console.log(err);        
-    }
-  }      
+    const randomIndex = Math.floor(Math.random() * cell.availableValues.length);
+    cell.value = cell.availableValues[randomIndex];
+    cell.availableValues = [];
+    calculateAvailableMovesPerCell(subBoards);
+    coordinate = getLeastAvailableMovesCellCoordinates(subBoards);
+  }     
 }

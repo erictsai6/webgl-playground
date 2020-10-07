@@ -1,4 +1,7 @@
 import { h, Component } from 'preact';
+import classnames from 'classnames';
+
+import './Cell.css';
 
 export type CellClass = {
   visible: boolean;
@@ -24,8 +27,13 @@ export class Cell extends Component<Props, any> {
     return (
       <div className="cell" onClick={() => {
         handleClick(i, j, x, y);
-      }}>
-        {visible && value}
+      }}>        
+        <div className={ classnames({
+          hidden: !visible,
+          "animate__animated animate__bounceIn": visible          
+        })}>
+          {value}
+        </div>
       </div>
     );
   }

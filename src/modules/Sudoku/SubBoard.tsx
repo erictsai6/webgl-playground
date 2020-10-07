@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 
 import { Cell, CellClass } from './Cell';
 
+import './SubBoard.css';
+
 export class SubBoardClass {
   cells: CellClass[][];
 }
