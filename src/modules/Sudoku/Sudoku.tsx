@@ -1,21 +1,25 @@
 import { h, Component } from 'preact';
+import classnames from 'classnames';
 
 import { Board } from './Board';
 import { SubBoardClass } from './SubBoard';
+import { SelectorNode } from './SelectorNode';
 
 import './Sudoku.css';
 import { fillBoard } from './GameLogic';
-
-class SelectorNode {
-  constructor(public id: number, public count: number) {}
-}
 
 export class Sudoku extends Component {  
 
   public state: {
     subBoards: SubBoardClass[][];
-    selectors: Array<SelectorNode>;
+    
+    selectors: number[];
     selectorsVisible: boolean;
+    selectedI?: number;
+    selectedJ?: number;
+    selectedX?: number;
+    selectedY?: number;
+
     overallX?: number;
     overallY?: number;
     errors: number;
@@ -72,15 +76,7 @@ export class Sudoku extends Component {
     return {
       cells
     };
-  }
-
-  getCleanSelectors() {
-    const selectors = [];
-    for (let i = 1; i < 10; i++) {
-      selectors.push(new SelectorNode(i, 9));
-    }
-    return selectors;
-  }
+  }  
 
   render() {
     const { 
@@ -88,68 +84,66 @@ export class Sudoku extends Component {
       errors
     } = this.state;
 
-    return (<div>
-      <h1>Concurrent Sudoku Game</h1>
-      
-      {subBoards.length && <Board 
+    return (<div className="">  
+      <div className="flex flex-row-reverse p-3">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={()=>{this.resetBoard()}}>
+            New game
+        </button>
+      </div>    
+      {subBoards.length && <Board         
         subBoards={subBoards} 
         handleClick={this.handleCellClick} 
         errors={errors} />
       }
       
-      {
-        this.state.selectorsVisible && <div className="selectors-panel">
-          <div>Selector</div>
-          <div className="">dd</div>
-        </div>
-      }
-      <div>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={()=>{this.resetBoard()}}>
-            New game
-        </button>
-      </div>
+      <div className={classnames({
+        "selectors-panel": true,
+        "animate__animated animate__fadeOut": !this.state.selectorsVisible,
+        "animate__animated animate__fadeIn": this.state.selectorsVisible          
+      })}>
+        {this.state.selectors.map(value => {
+          const props = {
+            value,
+            handleClick: this.handleSelectorClick
+          }
+          return (<SelectorNode {...props} />);
+        })}
+      </div>            
     </div>);
   }  
 
   handleCellClick = (i: number, j: number, x: number, y: number) => {
+    this.setState({
+      selectorsVisible: !this.state.selectorsVisible,
+      selectors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      selectedI: i,
+      selectedJ: j,
+      selectedX: x,
+      selectedY: y
+    });   
+  }
+
+  handleSelectorClick = (valueSelected: number) => {
+    const i = this.state.selectedI;
+    const j = this.state.selectedJ;
+    const x = this.state.selectedX;
+    const y = this.state.selectedY;
     const subBoards = [...this.state.subBoards];
 
     const subBoard = subBoards[i][j];
     const cell = subBoard.cells[x][y];
-    subBoard.cells[x][y] = { ...cell, visible: true };
 
-    this.setState(subBoards);
-    // this.selectorsVisible = true;
-    // this.i = i;
-    // this.j = j;
-    // this.x = x;
-    // this.y = y;
+    if (cell.value == valueSelected) {
+      subBoard.cells[x][y] = { ...cell, visible: true };
+
+      this.setState({
+        subBoards,
+        selectorsVisible: false
+      }); 
+    } else {
+      console.log('error counted, haha');
+    }
   }
-
-  // handleSelectorClick(value: number) {
-  //   const subBoard = this.subBoards[this.i][this.j];
-  //   const cell = subBoard.cells[this.x][this.y];
-
-  //   if (cell.value !== value) {
-  //     this.incrementErrors();
-  //   } else {
-  //     cell.visible = true;
-  //     this.hideSelectors();
-  //   }
-  // }
-
-  // hideSelectors() {
-  //   this.selectorsVisible = false;
-  //   this.i = null;
-  //   this.j = null;
-  //   this.x = null;
-  //   this.y = null;
-  // }
-
-  // incrementErrors() {
-  //   this.errors++;
-  // }
-
   
 }

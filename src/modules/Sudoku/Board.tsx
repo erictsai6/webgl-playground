@@ -16,7 +16,7 @@ export class Board extends Component<Props, any> {
       subBoards,
       handleClick
     } = props;
-    return (<div className="board">
+    return (<div className="p-3">
         {subBoards.map((boardRow, i) => {          
           return (<div className="board-row">{
             boardRow.map((subBoard, j) => {            

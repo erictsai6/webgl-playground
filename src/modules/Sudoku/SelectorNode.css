@@ -1,0 +1,7 @@
+.selector-node {
+  padding: 8px 0px;
+  flex-grow: 1;
+  /* color: var(--secondary-color); */
+  /* background-color: var(--gray); */
+  text-align: center;
+}
